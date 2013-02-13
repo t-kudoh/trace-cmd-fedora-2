@@ -1,9 +1,10 @@
-%global checkout 20120606git8266dff
-%global git_commit 8266dff
+#%global checkout 20120606git8266dff
+# git tag
+%global git_commit trace-cmd-v2.1.0
 
 Name: trace-cmd
-Version: 1.2
-Release: 4.%{checkout}%{?dist}
+Version: 2.1.0
+Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -13,10 +14,10 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # To generate:
 # git clone git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git
 # cd trace-cmd
-# git archive --prefix=trace-cmd-%%{version}.%%{checkout}/ -o trace-cmd-%%{version}.%%{checkout}.tar.gz %%{git_commit}
-Source0: trace-cmd-%{version}.%{checkout}.tar.gz
+# git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-%%{version}.tar.gz %%{git_commit}
+Source0: trace-cmd-%{version}.tar.gz
 Source1: kernelshark.desktop
-Patch1: trace-cmd-1.2-plugin-dir.patch
+Patch1: trace-cmd-2.1.0-plugin-dir.patch
 
 BuildRequires: xmlto
 BuildRequires: asciidoc
@@ -42,13 +43,13 @@ Kernelshark is the GUI frontend for analyzing data produced by
 'trace-cmd extract'
 
 %prep
-%setup -q -n %{name}-%{version}.%{checkout}
+%setup -q -n %{name}-%{version}
 %patch1 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
 MANPAGE_DOCBOOK_XSL=`rpm -ql docbook-style-xsl | grep manpages/docbook.xsl`
-make V=1 CFLAGS="%{optflags}" MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} all doc gui
+make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} all doc gui
 
 
 %install
@@ -75,6 +76,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Wed Feb 13 2013 Jon Stanley <jonstanley@gmail.com> - 2.1.0-1
+- Update to latest upstream
+
 * Thu Sep 13 2012 Jon Stanley <jonstanley@gmail.com> - 1.2-4.20120606git8266dff
 - Remove %%defattr
 
