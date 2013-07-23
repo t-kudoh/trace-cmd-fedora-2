@@ -1,9 +1,9 @@
-#%global checkout 20120606git8266dff
+#%global checkout 20130723git07f0eee2
 # git tag
-%global git_commit trace-cmd-v2.1.0
+%global git_commit trace-cmd-v2.2.1
 
 Name: trace-cmd
-Version: 2.1.0
+Version: 2.2.1
 Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
@@ -64,6 +64,7 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %doc COPYING COPYING.LIB README
 %{_bindir}/trace-cmd
 %{_libdir}/%{name}
+%{_prefix}/lib/%{name}
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 
@@ -76,6 +77,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Tue Jul 23 2013 Dwight Engen <dwight.engen@oracle.com> - 2.2.1-1
+- Update to 2.2.1
+
 * Wed Feb 13 2013 Jon Stanley <jonstanley@gmail.com> - 2.1.0-1
 - Update to latest upstream
 
