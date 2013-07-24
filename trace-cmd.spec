@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.2.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
