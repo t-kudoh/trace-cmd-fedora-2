@@ -64,7 +64,6 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %doc COPYING COPYING.LIB README
 %{_bindir}/trace-cmd
 %{_libdir}/%{name}
-%{_prefix}/lib/%{name}
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 
@@ -77,6 +76,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Wed Jul 24 2013 Jon Stanley <jonstanley@gmail.com> - 2.2.1-2
+- Remove addition to %%files - not needed with Makefile patch
+
 * Tue Jul 23 2013 Dwight Engen <dwight.engen@oracle.com> - 2.2.1-1
 - Update to 2.2.1
 
