@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.2.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -76,6 +76,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
 * Wed Jul 24 2013 Jon Stanley <jonstanley@gmail.com> - 2.2.1-2
 - Remove addition to %%files - not needed with Makefile patch
 
