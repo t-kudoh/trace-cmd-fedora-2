@@ -3,8 +3,8 @@
 %global git_commit trace-cmd-v2.2.1
 
 Name: trace-cmd
-Version: 2.2.1
-Release: 7%{?dist}
+Version: 2.6
+Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -17,7 +17,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-%%{version}.tar.gz %%{git_commit}
 Source0: trace-cmd-%{version}.tar.gz
 Source1: kernelshark.desktop
-Patch1: trace-cmd-2.1.0-plugin-dir.patch
+Patch1: trace-cmd-2.6-libdir.patch
 
 BuildRequires: xmlto
 BuildRequires: asciidoc
@@ -76,6 +76,11 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Thu Aug 18 2016 Jon Stanley <jonstanley@gmail.com> - 2.6-1
+- Upgrade to uptream 2.6
+- Rebase distro patch
+- Resolves: rhbz#1365951
+
 * Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.1-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
