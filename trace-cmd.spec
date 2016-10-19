@@ -1,10 +1,10 @@
 #%global checkout 20130723git07f0eee2
 # git tag
-%global git_commit trace-cmd-v2.2.1
+%global git_commit trace-cmd-v2.6
 
 Name: trace-cmd
 Version: 2.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -18,6 +18,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 Source0: trace-cmd-%{version}.tar.gz
 Source1: kernelshark.desktop
 Patch1: trace-cmd-2.6-libdir.patch
+Patch2: bz1386451-trace-cmd-record-crash-f-before-e.patch
 
 BuildRequires: xmlto
 BuildRequires: asciidoc
@@ -45,6 +46,7 @@ Kernelshark is the GUI frontend for analyzing data produced by
 %prep
 %setup -q -n %{name}-%{version}
 %patch1 -p1
+%patch2 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -56,6 +58,7 @@ make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK
 make V=1 DESTDIR=%{buildroot} prefix=%{_prefix} install install_doc install_gui
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
+find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
 install -dm 755 %{buildroot}/%{_datadir}/applications
 install -pm 644 %{SOURCE1} %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
@@ -76,6 +79,11 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Wed Oct 19 2016 Zamir SUN <zsun@fedoraproject.org> - 2.6-2
+- Add bz1386451-trace-cmd-record-crash-f-before-e.patch
+- Fix rpmlint error unstripped-binary-or-object
+- Resolves: rhbz#1386451
+
 * Thu Aug 18 2016 Jon Stanley <jonstanley@gmail.com> - 2.6-1
 - Upgrade to uptream 2.6
 - Rebase distro patch
