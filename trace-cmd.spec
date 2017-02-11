@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.6
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -79,6 +79,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Wed Oct 19 2016 Zamir SUN <zsun@fedoraproject.org> - 2.6-2
 - Add bz1386451-trace-cmd-record-crash-f-before-e.patch
 - Fix rpmlint error unstripped-binary-or-object
