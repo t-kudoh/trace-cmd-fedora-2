@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.6
-Release: 2%{?dist}
+Release: 2.1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -19,6 +19,7 @@ Source0: trace-cmd-%{version}.tar.gz
 Source1: kernelshark.desktop
 Patch1: trace-cmd-2.6-libdir.patch
 Patch2: bz1386451-trace-cmd-record-crash-f-before-e.patch
+Patch3: bz1389219-segmentation-fault-in-trace-snapshot.patch
 
 BuildRequires: xmlto
 BuildRequires: asciidoc
@@ -47,6 +48,7 @@ Kernelshark is the GUI frontend for analyzing data produced by
 %setup -q -n %{name}-%{version}
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -79,6 +81,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Mon Mar 27 2017 Zamir SUN <zsun@fedoraproject.org> - 2.6-2.1
+- Fix bz1389219 segmentation fault in trace-cmd snapshot
+
 * Wed Oct 19 2016 Zamir SUN <zsun@fedoraproject.org> - 2.6-2
 - Add bz1386451-trace-cmd-record-crash-f-before-e.patch
 - Fix rpmlint error unstripped-binary-or-object
