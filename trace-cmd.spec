@@ -1,10 +1,11 @@
-#%global checkout 20130723git07f0eee2
+#%global checkout 20170330git013205a8
 # git tag
-%global git_commit trace-cmd-v2.6
+#%global git_commit trace-cmd-v2.6
+%global git_commit 013205a8f9e60998b39c106470957030585b5851
 
 Name: trace-cmd
 Version: 2.6
-Release: 4%{?dist}
+Release: 4.20170330git013205%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -18,9 +19,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 Source0: trace-cmd-%{version}.tar.gz
 Source1: kernelshark.desktop
 Patch1: trace-cmd-2.6-libdir.patch
-Patch2: bz1386451-trace-cmd-record-crash-f-before-e.patch
-Patch3: bz1389219-segmentation-fault-in-trace-snapshot.patch
-
+Patch2: bz1389219-segmentation-fault-in-trace-snapshot.patch
 BuildRequires: xmlto
 BuildRequires: asciidoc
 BuildRequires: mlocate
@@ -48,7 +47,6 @@ Kernelshark is the GUI frontend for analyzing data produced by
 %setup -q -n %{name}-%{version}
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -78,9 +76,13 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %{_bindir}/kernelshark
 %{_datadir}/kernelshark
 %{_datadir}/applications/kernelshark.desktop
+%{_sysconfdir}/bash_completion.d/trace-cmd.bash
 
 
 %changelog
+* Thu Mar 30 2017 Zamir SUN <zsun@fedoraproject.org> - 2.6-4.20170330git013205
+- Rebase to newest upstream version to include various bug fixes.
+
 * Mon Mar 27 2017 Zamir SUN <zsun@fedoraproject.org> - 2.6-4
 - Fix bz1389219 segmentation fault in trace-cmd snapshot
 
