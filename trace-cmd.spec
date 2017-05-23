@@ -78,7 +78,7 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
-* Thu Mar 30 2017 Zamir SUN <zsun@fedoraproject.org> - 2.6.1-1
+* Thu May 23 2017 Zamir SUN <zsun@fedoraproject.org> - 2.6.1-1
 - Rebase to 2.6.1.
 
 * Thu Mar 30 2017 Zamir SUN <zsun@fedoraproject.org> - 2.6-4.20170330git013205
