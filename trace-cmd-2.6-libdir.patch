@@ -7,8 +7,8 @@ diff -up ./Makefile.orig ./Makefile
  
 +# figure out what arch we are on and install to the right place
 +ARCH = $(shell getconf LONG_BIT)
-+LIBDIR_32 = lib
-+LIBDIR_64 = lib64
++LIBDIR_32 = /usr/lib
++LIBDIR_64 = /usr/lib64
 +libdir=$(LIBDIR_$(ARCH))
 +
 +
