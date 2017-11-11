@@ -1,24 +1,23 @@
-#%global checkout 20170330git013205a8
 # git tag
-#%global git_commit trace-cmd-v2.6
-%global git_commit 021710e1073fe203341b427cd1a4bac577ec899c
+#%%global git_commit trace-cmd-v2.6.2
+#%%global git_commit 57371aaa2f469d0ba15fd85276deca7bfdd7ce36
 
 Name: trace-cmd
-Version: 2.6.1
-Release: 3%{?dist}
+Version: 2.6.2
+Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
 Group: Development/Tools
 URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
-# Upstream does not provide tarballs.
+# If upstream does not provide tarballs.
 # To generate:
 # git clone git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git
 # cd trace-cmd
-# git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-%%{version}.tar.gz %%{git_commit}
-Source0: trace-cmd-%{version}.tar.gz
+# git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
+Source0: https://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git/snapshot/%{name}-v%{version}.tar.gz
 Source1: kernelshark.desktop
-Patch1: trace-cmd-2.6-libdir.patch
+Patch1: 0001-trace-cmd-Figure-out-the-arch-and-install-library-to.patch
 BuildRequires: xmlto
 BuildRequires: asciidoc
 BuildRequires: mlocate
@@ -43,7 +42,7 @@ Kernelshark is the GUI frontend for analyzing data produced by
 'trace-cmd extract'
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{name}-v%{version}
 %patch1 -p1
 
 %build
@@ -53,7 +52,7 @@ make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK
 
 
 %install
-make V=1 DESTDIR=%{buildroot} prefix=%{_prefix} install install_doc install_gui
+make V=1 DESTDIR=%{buildroot}/ prefix=%{_prefix} install install_doc install_gui
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
@@ -78,6 +77,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Sat Nov 11 2017 Zamir SUN <zsun@fedoraproject.org> - 2.6.2-1
+- Rebase to 2.6.2.
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
