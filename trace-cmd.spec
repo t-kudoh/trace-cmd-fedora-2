@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.6.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -77,6 +77,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
 * Sat Nov 11 2017 Zamir SUN <zsun@fedoraproject.org> - 2.6.2-1
 - Rebase to 2.6.2.
 
