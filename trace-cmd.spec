@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.6.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -48,7 +48,8 @@ Kernelshark is the GUI frontend for analyzing data produced by
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
 MANPAGE_DOCBOOK_XSL=`rpm -ql docbook-style-xsl | grep manpages/docbook.xsl`
-make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} all doc gui
+make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" \
+  MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} all doc gui
 
 
 %install
@@ -77,6 +78,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Fri Feb 23 2018 Florian Weimer <fweimer@redhat.com> - 2.6.2-3
+- Use LDFLAGS from redhat-rpm-config
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
