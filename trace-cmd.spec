@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -16,6 +16,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 Source0: https://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git/snapshot/%{name}-v%{version}.tar.gz
 Source1: kernelshark.desktop
 Patch1: 0001-trace-cmd-Figure-out-the-arch-and-install-library-to.patch
+Patch2: 0002-trace-cmd-Fix-the-logic-behind-SWIG_DEFINED-in-the-M.patch
 BuildRequires: xmlto
 BuildRequires: asciidoc
 BuildRequires: mlocate
@@ -38,19 +39,29 @@ Requires: trace-cmd%{_isa} = %{version}-%{release}
 Kernelshark is the GUI frontend for analyzing data produced by
 'trace-cmd extract'
 
+%package python2
+Summary: Python plugin support for trace-cmd
+Requires: trace-cmd%{_isa} = %{version}-%{release}
+BuildRequires: swig
+BuildRequires: python2-devel
+
+%description  python2
+Python plugin support for trace-cmd
+
 %prep
 %setup -q -n %{name}-v%{version}
 %patch1 -p1
+%patch2 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
 MANPAGE_DOCBOOK_XSL=`rpm -ql docbook-style-xsl | grep manpages/docbook.xsl`
 make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" \
-  MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} all doc gui
+  MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} all doc gui python-plugin
 
 
 %install
-make V=1 DESTDIR=%{buildroot}/ prefix=%{_prefix} install install_doc install_gui
+make V=1 DESTDIR=%{buildroot}/ prefix=%{_prefix} install install_doc install_gui install_python
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
@@ -61,7 +72,20 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %files
 %doc COPYING COPYING.LIB README
 %{_bindir}/trace-cmd
-%{_libdir}/%{name}
+%dir %{_libdir}/%{name}
+%dir %{_libdir}/%{name}/plugins
+%{_libdir}/%{name}/plugins/plugin_blk.so
+%{_libdir}/%{name}/plugins/plugin_cfg80211.so
+%{_libdir}/%{name}/plugins/plugin_function.so
+%{_libdir}/%{name}/plugins/plugin_hrtimer.so
+%{_libdir}/%{name}/plugins/plugin_jbd2.so
+%{_libdir}/%{name}/plugins/plugin_kmem.so
+%{_libdir}/%{name}/plugins/plugin_kvm.so
+%{_libdir}/%{name}/plugins/plugin_mac80211.so
+%{_libdir}/%{name}/plugins/plugin_sched_switch.so
+%{_libdir}/%{name}/plugins/plugin_scsi.so
+%{_libdir}/%{name}/plugins/plugin_tlb.so
+%{_libdir}/%{name}/plugins/plugin_xen.so
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 
@@ -73,8 +97,17 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %{_datadir}/applications/kernelshark.desktop
 %{_sysconfdir}/bash_completion.d/trace-cmd.bash
 
+%files python2
+%doc Documentation/README.PythonPlugin
+%{_libdir}/%{name}/plugins/plugin_python.so
+%{_libdir}/%{name}/python/
+
+
 
 %changelog
+* Fri Mar 02 2018 Zamir SUN <sztsian@gmail.com> - 2.7-2
+- Add python plugins
+
 * Fri Mar 02 2018 Zamir SUN <sztsian@gmail.com> - 2.7-1
 - Update to 2.7
 - Remove Groups tag
