@@ -3,15 +3,13 @@
 #%%global git_commit 57371aaa2f469d0ba15fd85276deca7bfdd7ce36
 
 Name: trace-cmd
-Version: 2.6.2
-Release: 3%{?dist}
+Version: 2.7
+Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
-Group: Development/Tools
 URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
-# If upstream does not provide tarballs.
-# To generate:
+# If upstream does not provide tarballs, to generate:
 # git clone git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
@@ -34,7 +32,6 @@ tracers and will record into a data file.
 
 %package -n kernelshark
 Summary: GUI analysis for Ftrace data captured by trace-cmd
-Group: Development/Tools
 Requires: trace-cmd%{_isa} = %{version}-%{release}
 
 %description -n kernelshark
@@ -78,6 +75,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Fri Mar 02 2018 Zamir SUN <sztsian@gmail.com> - 2.7-1
+- Update to 2.7
+- Remove Groups tag
+
 * Fri Feb 23 2018 Florian Weimer <fweimer@redhat.com> - 2.6.2-3
 - Use LDFLAGS from redhat-rpm-config
 
