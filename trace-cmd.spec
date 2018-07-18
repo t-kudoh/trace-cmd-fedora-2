@@ -17,6 +17,7 @@ Source0: https://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git/s
 Source1: kernelshark.desktop
 Patch1: 0001-trace-cmd-Figure-out-the-arch-and-install-library-to.patch
 Patch2: 0002-trace-cmd-Fix-the-logic-behind-SWIG_DEFINED-in-the-M.patch
+BuildRequires:  gcc
 BuildRequires: xmlto
 BuildRequires: asciidoc
 BuildRequires: mlocate
