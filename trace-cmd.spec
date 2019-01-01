@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.7
-Release: 4%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -40,14 +40,14 @@ Requires: trace-cmd%{_isa} = %{version}-%{release}
 Kernelshark is the GUI frontend for analyzing data produced by
 'trace-cmd extract'
 
-%package python3
-Summary: Python3 plugin support for trace-cmd
+%package python2
+Summary: Python plugin support for trace-cmd
 Requires: trace-cmd%{_isa} = %{version}-%{release}
 BuildRequires: swig
-BuildRequires: python3-devel
+BuildRequires: python2-devel
 
-%description  python3
-Python3 plugin support for trace-cmd
+%description  python2
+Python plugin support for trace-cmd
 
 %prep
 %setup -q -n %{name}-v%{version}
@@ -58,7 +58,7 @@ Python3 plugin support for trace-cmd
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
 MANPAGE_DOCBOOK_XSL=`rpm -ql docbook-style-xsl | grep manpages/docbook.xsl`
 make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" \
-  MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} PYTHON_VERS=python3 all doc gui python-plugin
+  MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} all doc gui python-plugin
 
 
 %install
@@ -98,7 +98,7 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %{_datadir}/applications/kernelshark.desktop
 %{_sysconfdir}/bash_completion.d/trace-cmd.bash
 
-%files python3
+%files python2
 %doc Documentation/README.PythonPlugin
 %{_libdir}/%{name}/plugins/plugin_python.so
 %{_libdir}/%{name}/python/
@@ -106,9 +106,6 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
-* Tue Jan 01 2019 Zamir SUN <sztsian@gmail.com> - 2.7-4
-- Replace python2 with python3.
-
 * Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
