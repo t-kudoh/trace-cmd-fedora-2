@@ -24,7 +24,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export PACKAGE_NAME=trace-cmd
-export TEST=/kernel/general/ftrace/tools/trace-cmd/sanity
+export TEST=/kernel/general/ftrace/tools/trace-cmd/upstream
 export TESTVERSION=0.1
 
 FILES=$(METADATA) runtest.sh Makefile PURPOSE
