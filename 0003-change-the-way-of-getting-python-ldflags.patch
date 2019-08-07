@@ -1,0 +1,36 @@
+From c7e94b0d5d654162851bd6f62ed535c8721091e3 Mon Sep 17 00:00:00 2001
+From: Zamir SUN <sztsian@gmail.com>
+Date: Sun, 4 Feb 2018 11:20:14 +0800
+Subject: trace-cmd: Change the way of getting python ldflags.
+
+Prior than this patch, Makefile detects python ldflags using a hardcoded
+python command. It will cause problems if we are building against
+python3 in the future when ldflags for python2 and python3 are
+different. With this patch, python ldflags are detected by
+corresponding python{,3}-config which will detect the right config for
+python plugins.
+
+Link: http://lkml.kernel.org/r/20180204032014.6962-3-sztsian@gmail.com
+
+Signed-off-by: Zamir SUN (Red Hat) <sztsian@gmail.com>
+Signed-off-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 6b0c3c5..f9b7f65 100644
+--- a/Makefile
++++ b/Makefile
+@@ -642,7 +642,7 @@ report_noswig: force
+ 
+ PYTHON_INCLUDES = `pkg-config --cflags $(PYTHON_VERS)`
+ PYTHON_LDFLAGS = `pkg-config --libs $(PYTHON_VERS)` \
+-		$(shell python2 -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LINKFORSHARED')")
++		$(shell $(PYTHON_VERS)-config --ldflags)
+ PYGTK_CFLAGS = `pkg-config --cflags pygtk-2.0`
+ 
+ ctracecmd.so: $(TCMD_LIB_OBJS) ctracecmd.i
+-- 
+2.21.0
+

@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.7
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -17,6 +17,7 @@ Source0: https://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git/s
 Source1: kernelshark.desktop
 Patch1: 0001-trace-cmd-Figure-out-the-arch-and-install-library-to.patch
 Patch2: 0002-trace-cmd-Fix-the-logic-behind-SWIG_DEFINED-in-the-M.patch
+Patch3: 0003-change-the-way-of-getting-python-ldflags.patch
 BuildRequires:  gcc
 BuildRequires: xmlto
 BuildRequires: asciidoc
@@ -53,6 +54,7 @@ Python plugin support for trace-cmd
 %setup -q -n %{name}-v%{version}
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -60,7 +62,7 @@ MANPAGE_DOCBOOK_XSL=`rpm -ql docbook-style-xsl | grep manpages/docbook.xsl`
 make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" \
   MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} \
   PYTHON_VERS=python3 all doc gui python-plugin
-
+sed -i 's/env python2/python3/g' event-viewer.py
 
 %install
 make V=1 DESTDIR=%{buildroot}/ prefix=%{_prefix} install install_doc install_gui install_python
@@ -107,6 +109,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Wed Aug 07 2019 Zamir SUN <sztsian@gmail.com> - 2.7-7
+- Fix more python2 residuals.
+- Fixes 1738158
+
 * Sat Aug 03 2019 Zamir SUN <sztsian@gmail.com> - 2.7-6
 - Switch the python plugin to python3
 
