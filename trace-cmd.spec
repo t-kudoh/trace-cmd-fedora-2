@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.7
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -109,6 +109,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Mon Aug 19 2019 Miro Hrončok <mhroncok@redhat.com> - 2.7-8
+- Rebuilt for Python 3.8
+
 * Wed Aug 07 2019 Zamir SUN <sztsian@gmail.com> - 2.7-7
 - Fix more python2 residuals.
 - Fixes 1738158
