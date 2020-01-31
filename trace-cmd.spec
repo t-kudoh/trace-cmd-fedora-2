@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.7
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -109,6 +109,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Mon Aug 19 2019 Miro Hrončok <mhroncok@redhat.com> - 2.7-8
 - Rebuilt for Python 3.8
 
