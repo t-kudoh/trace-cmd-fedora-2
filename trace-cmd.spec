@@ -3,8 +3,8 @@
 #%%global git_commit 57371aaa2f469d0ba15fd85276deca7bfdd7ce36
 
 Name: trace-cmd
-Version: 2.7
-Release: 9%{?dist}
+Version: 2.8.3
+Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -13,20 +13,21 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # git clone git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
-Source0: https://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git/snapshot/%{name}-v%{version}.tar.gz
-Source1: kernelshark.desktop
-Patch1: 0001-trace-cmd-Figure-out-the-arch-and-install-library-to.patch
-Patch2: 0002-trace-cmd-Fix-the-logic-behind-SWIG_DEFINED-in-the-M.patch
-Patch3: 0003-change-the-way-of-getting-python-ldflags.patch
+Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz
+Patch0: 0001-libdir-cmake.patch
 BuildRequires:  gcc
 BuildRequires: xmlto
 BuildRequires: asciidoc
 BuildRequires: mlocate
+BuildRequires: graphviz doxygen
 # needed for the GUI parts
 BuildRequires: libxml2-devel
-BuildRequires: gtk2-devel
-BuildRequires: glib2-devel
+BuildRequires: gcc-c++
 BuildRequires: desktop-file-utils
+BuildRequires: cmake
+BuildRequires: qt5-qtbase-devel
+BuildRequires: freeglut-devel
+BuildRequires: json-c-devel
 
 %description
 trace-cmd is a user interface to Ftrace. Instead of needing to use the
@@ -52,25 +53,26 @@ Python plugin support for trace-cmd
 
 %prep
 %setup -q -n %{name}-v%{version}
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch0 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
+# -z muldefs to workaround the enforcing multi definition check of gcc10.
+# and it need to be removed once upstream fixed the variable name
 MANPAGE_DOCBOOK_XSL=`rpm -ql docbook-style-xsl | grep manpages/docbook.xsl`
-make V=1 CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" \
-  MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL prefix=%{_prefix} \
+CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release \
+  libdir=%{_libdir} make V=1 MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL \
+  prefix=%{_prefix} libdir=%{_libdir} \
   PYTHON_VERS=python3 all doc gui python-plugin
-sed -i 's/env python2/python3/g' event-viewer.py
+for i in python/*.py ; do 
+    sed -i 's/env python2/python3/g' $i
+done
 
 %install
-make V=1 DESTDIR=%{buildroot}/ prefix=%{_prefix} install install_doc install_gui install_python
+make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ prefix=%{_prefix} install install_doc install_gui install_python
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
-install -dm 755 %{buildroot}/%{_datadir}/applications
-install -pm 644 %{SOURCE1} %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 %files
@@ -81,6 +83,7 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %{_libdir}/%{name}/plugins/plugin_blk.so
 %{_libdir}/%{name}/plugins/plugin_cfg80211.so
 %{_libdir}/%{name}/plugins/plugin_function.so
+%{_libdir}/%{name}/plugins/plugin_futex.so
 %{_libdir}/%{name}/plugins/plugin_hrtimer.so
 %{_libdir}/%{name}/plugins/plugin_jbd2.so
 %{_libdir}/%{name}/plugins/plugin_kmem.so
@@ -90,16 +93,20 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %{_libdir}/%{name}/plugins/plugin_scsi.so
 %{_libdir}/%{name}/plugins/plugin_tlb.so
 %{_libdir}/%{name}/plugins/plugin_xen.so
-%{_mandir}/man1/*
-%{_mandir}/man5/*
+%{_mandir}/man1/%{name}*
+%{_mandir}/man5/%{name}*
+%{_sysconfdir}/bash_completion.d/trace-cmd.bash
 
 %files -n kernelshark
-%{_bindir}/trace-view
-%{_bindir}/trace-graph
 %{_bindir}/kernelshark
+%{_bindir}/kshark-record
+%{_bindir}/kshark-su-record
 %{_datadir}/kernelshark
+%{_libdir}/kernelshark
 %{_datadir}/applications/kernelshark.desktop
-%{_sysconfdir}/bash_completion.d/trace-cmd.bash
+%{_datadir}/icons/kernelshark
+%{_mandir}/man1/kernelshark.1.gz
+%{_datadir}/polkit-1/actions/org.freedesktop.kshark-record.policy
 
 %files python3
 %doc Documentation/README.PythonPlugin
@@ -109,6 +116,12 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Sat Feb 08 2020 Zamir SUN <sztsian@gmail.com> - 2.8-1
+- Update to 2.8
+- Add workaround to resolve gcc 10 multiple definition of `common_type_field' problem
+- Resolves 1794296
+- Resolves 1727368
+
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.7-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 

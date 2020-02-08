@@ -1,0 +1,68 @@
+diff --git a/Makefile b/Makefile
+index 2bcc383..159b87f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -262,7 +262,7 @@ all_cmd: $(CMD_TARGETS)
+ CMAKE_COMMAND = /usr/bin/cmake
+ 
+ $(kshark-dir)/build/Makefile: $(kshark-dir)/CMakeLists.txt
+-	$(Q) cd $(kshark-dir)/build && $(CMAKE_COMMAND) -D_INSTALL_PREFIX=$(prefix) ..
++	$(Q) cd $(kshark-dir)/build && $(CMAKE_COMMAND) -D_INSTALL_PREFIX=$(prefix)  -D_LIBDIR=$(libdir) ..
+ 
+ gui: force $(CMD_TARGETS) $(kshark-dir)/build/Makefile
+ 	$(Q)$(MAKE) $(S) -C $(kshark-dir)/build
+diff --git a/kernel-shark/CMakeLists.txt b/kernel-shark/CMakeLists.txt
+index 145b058..bf24ed6 100644
+--- a/kernel-shark/CMakeLists.txt
++++ b/kernel-shark/CMakeLists.txt
+@@ -30,17 +30,21 @@ if (Qt5Widgets_FOUND)
+ 
+ endif (Qt5Widgets_FOUND)
+ 
+-set(LIBRARY_OUTPUT_PATH    "${KS_DIR}/lib")
+-set(EXECUTABLE_OUTPUT_PATH "${KS_DIR}/bin")
+-
+-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -g -pthread -fPIC")
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -std=c++11 -pthread -fPIC")
+-
+ if(NOT _INSTALL_PREFIX)
+ 	set(_INSTALL_PREFIX "/usr/local")
+ endif()
+ 
+-set(KS_PLUGIN_INSTALL_PREFIX ${_INSTALL_PREFIX}/lib/${KS_APP_NAME}/plugins/)
++if (NOT _LIBDIR)
++    set(_LIBDIR "${_INSTALL_PREFIX}/lib")
++endif (NOT _LIBDIR)
++
++set(LIBRARY_OUTPUT_PATH    "${KS_DIR}/${_LIBDIR}")
++set(EXECUTABLE_OUTPUT_PATH "${KS_DIR}/${_INSTALL_PREFIX}/bin")
++
++set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -g -pthread -fPIC")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -std=c++11 -pthread -fPIC")
++
++set(KS_PLUGIN_INSTALL_PREFIX ${_LIBDIR}/${KS_APP_NAME}/plugins/)
+ set(KS_ICON ksharkicon.png)
+ 
+ if (NOT _DEBUG)
+@@ -50,7 +54,7 @@ if (NOT _DEBUG)
+ 
+ endif (NOT _DEBUG)
+ 
+-SET(CMAKE_INSTALL_RPATH "${_INSTALL_PREFIX}/lib/${KS_APP_NAME}/")
++SET(CMAKE_INSTALL_RPATH "${_LIBDIR}/${KS_APP_NAME}/")
+ SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+ 
+ include_directories(${KS_DIR}/src/
+diff --git a/kernel-shark/src/CMakeLists.txt b/kernel-shark/src/CMakeLists.txt
+index 6cbc00f..b790c7a 100644
+--- a/kernel-shark/src/CMakeLists.txt
++++ b/kernel-shark/src/CMakeLists.txt
+@@ -79,7 +79,7 @@ if (Qt5Widgets_FOUND AND Qt5Network_FOUND)
+ 
+     install(TARGETS ${KS_APP_NAME} kshark-record kshark kshark-plot kshark-gui
+             RUNTIME DESTINATION ${_INSTALL_PREFIX}/bin/
+-            LIBRARY DESTINATION ${_INSTALL_PREFIX}/lib/${KS_APP_NAME}/)
++	    LIBRARY DESTINATION ${_LIBDIR}/${KS_APP_NAME}/)
+ 
+     install(FILES "${KS_DIR}/${KS_APP_NAME}.desktop"
+             DESTINATION ${_INSTALL_PREFIX}/share/applications/)
