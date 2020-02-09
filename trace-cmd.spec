@@ -116,7 +116,7 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
-* Sat Feb 08 2020 Zamir SUN <sztsian@gmail.com> - 2.8-1
+* Sat Feb 08 2020 Zamir SUN <sztsian@gmail.com> - 2.8.3-1
 - Update to 2.8
 - Add workaround to resolve gcc 10 multiple definition of `common_type_field' problem
 - Resolves 1794296
