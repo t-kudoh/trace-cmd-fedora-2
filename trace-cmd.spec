@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.8.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -116,6 +116,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Tue Apr 21 2020 Björn Esser <besser82@fedoraproject.org> - 2.8.3-2
+- Rebuild (json-c)
+
 * Sat Feb 08 2020 Zamir SUN <sztsian@gmail.com> - 2.8.3-1
 - Update to 2.8
 - Add workaround to resolve gcc 10 multiple definition of `common_type_field' problem
