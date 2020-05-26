@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.8.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -15,6 +15,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz
 Patch0: 0001-libdir-cmake.patch
+Patch1: linklibs.patch
 BuildRequires:  gcc
 BuildRequires: xmlto
 BuildRequires: asciidoc
@@ -54,6 +55,7 @@ Python plugin support for trace-cmd
 %prep
 %setup -q -n %{name}-v%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -116,6 +118,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Tue May 26 2020 Jeff Law <law@redhat.com> - 2.8.3-3
+- TRACECMD_LIBRARY can reference things in TRACEEVENT_LIBRARY, so
+  link TRACEEVENT_LIBRARY after TRACECMD_LIBRARY.
+
 * Tue Apr 21 2020 Björn Esser <besser82@fedoraproject.org> - 2.8.3-2
 - Rebuild (json-c)
 

@@ -1,0 +1,14 @@
+diff --git a/kernel-shark/src/CMakeLists.txt b/kernel-shark/src/CMakeLists.txt
+index b790c7a..b78e8d2 100644
+--- a/kernel-shark/src/CMakeLists.txt
++++ b/kernel-shark/src/CMakeLists.txt
+@@ -10,7 +10,8 @@ add_library(kshark SHARED libkshark.c
+ target_link_libraries(kshark ${CMAKE_DL_LIBS}
+                              ${JSONC_LIBRARY}
+                              ${TRACEEVENT_LIBRARY}
+-                             ${TRACECMD_LIBRARY})
++                             ${TRACECMD_LIBRARY}
++                             ${TRACEEVENT_LIBRARY})
+ 
+ set_target_properties(kshark  PROPERTIES SUFFIX	".so.${KS_VERSION_STRING}")
+ 
