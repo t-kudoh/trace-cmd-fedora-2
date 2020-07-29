@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.8.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 
@@ -118,6 +118,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 
 
 %changelog
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Tue May 26 2020 Jeff Law <law@redhat.com> - 2.8.3-3
 - TRACECMD_LIBRARY can reference things in TRACEEVENT_LIBRARY, so
   link TRACEEVENT_LIBRARY after TRACECMD_LIBRARY.
