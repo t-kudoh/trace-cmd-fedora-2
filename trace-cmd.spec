@@ -3,25 +3,23 @@
 #%%global git_commit 57371aaa2f469d0ba15fd85276deca7bfdd7ce36
 
 Name: trace-cmd
-Version: 2.8.3
-Release: 4%{?dist}
+Version: 2.9.1
+Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
+Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
 
 URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # If upstream does not provide tarballs, to generate:
-# git clone git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git
+# git clone https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz
-Patch0: 0001-libdir-cmake.patch
-Patch1: linklibs.patch
 BuildRequires:  gcc
 BuildRequires: xmlto
 BuildRequires: asciidoc
 BuildRequires: mlocate
 BuildRequires: graphviz doxygen
-# needed for the GUI parts
 BuildRequires: libxml2-devel
 BuildRequires: gcc-c++
 BuildRequires: desktop-file-utils
@@ -37,7 +35,7 @@ tracers and will record into a data file.
 
 %package -n kernelshark
 Summary: GUI analysis for Ftrace data captured by trace-cmd
-Requires: trace-cmd%{_isa} = %{version}-%{release}
+Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
 
 %description -n kernelshark
 Kernelshark is the GUI frontend for analyzing data produced by
@@ -52,49 +50,54 @@ BuildRequires: python3-devel
 %description  python3
 Python plugin support for trace-cmd
 
+%package libs
+Summary: Libraries of trace-cmd
+
+%description libs
+Libraries of trace-cmd
+
+%package devel
+Summary: Development headers of trace-cmd-libs
+Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
+
+%description devel
+Development headers of trace-cmd-libs
+
 %prep
 %setup -q -n %{name}-v%{version}
-%patch0 -p1
-%patch1 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
 # -z muldefs to workaround the enforcing multi definition check of gcc10.
 # and it need to be removed once upstream fixed the variable name
 MANPAGE_DOCBOOK_XSL=`rpm -ql docbook-style-xsl | grep manpages/docbook.xsl`
-CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release \
-  libdir=%{_libdir} make V=1 MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL \
+CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" BUILD_TYPE=Release \
+  make V=9999999999 MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL \
   prefix=%{_prefix} libdir=%{_libdir} \
-  PYTHON_VERS=python3 all doc gui python-plugin
+  PYTHON_VERS=python3 all doc plugins libs
+# In theory we should manual compile kernelshark by make gui.
+# However this always fails since Fedora 33. But it compiles fine when install.
+# So right now we do not compile it in build phase.
+#CFLAGS="%%{optflags} -D_GNU_SOURCE" LDFLAGS="%%{build_ldflags}" BUILD_TYPE=Release \
+#  libdir=%%{_libdir} make V=9999999999 MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL \
+#  prefix=%%{_prefix} libdir=%%{_libdir} gui
 for i in python/*.py ; do 
     sed -i 's/env python2/python3/g' $i
 done
 
 %install
-make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ prefix=%{_prefix} install install_doc install_gui install_python
+make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release install install_doc install_gui install_python install_libs
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
+sed -i '/Version/d' %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
+mkdir -p %{buildroot}/%{_sysconfdir}
+mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_completion.d
 
 %files
 %doc COPYING COPYING.LIB README
 %{_bindir}/trace-cmd
-%dir %{_libdir}/%{name}
-%dir %{_libdir}/%{name}/plugins
-%{_libdir}/%{name}/plugins/plugin_blk.so
-%{_libdir}/%{name}/plugins/plugin_cfg80211.so
-%{_libdir}/%{name}/plugins/plugin_function.so
-%{_libdir}/%{name}/plugins/plugin_futex.so
-%{_libdir}/%{name}/plugins/plugin_hrtimer.so
-%{_libdir}/%{name}/plugins/plugin_jbd2.so
-%{_libdir}/%{name}/plugins/plugin_kmem.so
-%{_libdir}/%{name}/plugins/plugin_kvm.so
-%{_libdir}/%{name}/plugins/plugin_mac80211.so
-%{_libdir}/%{name}/plugins/plugin_sched_switch.so
-%{_libdir}/%{name}/plugins/plugin_scsi.so
-%{_libdir}/%{name}/plugins/plugin_tlb.so
-%{_libdir}/%{name}/plugins/plugin_xen.so
 %{_mandir}/man1/%{name}*
 %{_mandir}/man5/%{name}*
 %{_sysconfdir}/bash_completion.d/trace-cmd.bash
@@ -103,21 +106,34 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 %{_bindir}/kernelshark
 %{_bindir}/kshark-record
 %{_bindir}/kshark-su-record
-%{_datadir}/kernelshark
+%dir %{_libdir}/kernelshark
 %{_libdir}/kernelshark
 %{_datadir}/applications/kernelshark.desktop
+%dir %{_datadir}/icons/kernelshark
 %{_datadir}/icons/kernelshark
-%{_mandir}/man1/kernelshark.1.gz
 %{_datadir}/polkit-1/actions/org.freedesktop.kshark-record.policy
 
 %files python3
 %doc Documentation/README.PythonPlugin
-%{_libdir}/%{name}/plugins/plugin_python.so
 %{_libdir}/%{name}/python/
 
+%files libs
+%dir %{_libdir}/%{name}
+%dir %{_libdir}/traceevent/
+%dir %{_libdir}/tracefs/
+%{_libdir}/trace-cmd/
+%{_libdir}/traceevent/
+%{_libdir}/tracefs/
 
+%files devel
+%{_includedir}/trace-cmd
+%{_includedir}/traceevent
+%{_includedir}/tracefs
 
 %changelog
+* Fri Aug 07 2020 Zamir SUN <sztsian@gmail.com> - 2.9.1-1
+- Update to 2.9.1
+
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.3-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
