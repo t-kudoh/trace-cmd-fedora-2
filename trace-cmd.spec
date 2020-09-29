@@ -4,7 +4,7 @@
 
 Name: trace-cmd
 Version: 2.9.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
@@ -32,14 +32,6 @@ BuildRequires: json-c-devel
 trace-cmd is a user interface to Ftrace. Instead of needing to use the
 debugfs directly, trace-cmd will handle of setting of options and
 tracers and will record into a data file.
-
-%package -n kernelshark
-Summary: GUI analysis for Ftrace data captured by trace-cmd
-Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
-
-%description -n kernelshark
-Kernelshark is the GUI frontend for analyzing data produced by
-'trace-cmd extract'
 
 %package python3
 Summary: Python plugin support for trace-cmd
@@ -75,23 +67,17 @@ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" BUILD_TYPE=Release
   make V=9999999999 MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL \
   prefix=%{_prefix} libdir=%{_libdir} \
   PYTHON_VERS=python3 all doc plugins libs
-# In theory we should manual compile kernelshark by make gui.
-# However this always fails since Fedora 33. But it compiles fine when install.
-# So right now we do not compile it in build phase.
-#CFLAGS="%%{optflags} -D_GNU_SOURCE" LDFLAGS="%%{build_ldflags}" BUILD_TYPE=Release \
-#  libdir=%%{_libdir} make V=9999999999 MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL \
-#  prefix=%%{_prefix} libdir=%%{_libdir} gui
 for i in python/*.py ; do 
     sed -i 's/env python2/python3/g' $i
 done
 
 %install
-make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release install install_doc install_gui install_python install_libs
+make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release install install_doc install_python install_libs
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
-sed -i '/Version/d' %{buildroot}/%{_datadir}/applications/kernelshark.desktop
-desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
+#sed -i '/Version/d' %{buildroot}/%{_datadir}/applications/kernelshark.desktop
+#desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 mkdir -p %{buildroot}/%{_sysconfdir}
 mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_completion.d
 
@@ -101,17 +87,6 @@ mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_compl
 %{_mandir}/man1/%{name}*
 %{_mandir}/man5/%{name}*
 %{_sysconfdir}/bash_completion.d/trace-cmd.bash
-
-%files -n kernelshark
-%{_bindir}/kernelshark
-%{_bindir}/kshark-record
-%{_bindir}/kshark-su-record
-%dir %{_libdir}/kernelshark
-%{_libdir}/kernelshark
-%{_datadir}/applications/kernelshark.desktop
-%dir %{_datadir}/icons/kernelshark
-%{_datadir}/icons/kernelshark
-%{_datadir}/polkit-1/actions/org.freedesktop.kshark-record.policy
 
 %files python3
 %doc Documentation/README.PythonPlugin
@@ -131,6 +106,9 @@ mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_compl
 %{_includedir}/tracefs
 
 %changelog
+* Tue Sep 29 2020 Zamir SUN <sztsian@gmail.com> - 2.9.1-2
+- Remove kernelsharl as it's now separate package
+
 * Fri Aug 07 2020 Zamir SUN <sztsian@gmail.com> - 2.9.1-1
 - Update to 2.9.1
 
