@@ -4,7 +4,8 @@
 
 Name: trace-cmd
 Version: 2.9.1
-Release: 2%{?dist}
+# Note: After libtraceevent separated, remember to bump release to more than 20 to force a kernelshark update
+Release: 3%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
@@ -15,6 +16,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz
+Patch0: 0001-trace-cmd-Temporary-move-libtraceevent-back-to-_libd.patch
 BuildRequires:  gcc
 BuildRequires: xmlto
 BuildRequires: asciidoc
@@ -57,6 +59,7 @@ Development headers of trace-cmd-libs
 
 %prep
 %setup -q -n %{name}-v%{version}
+%patch0 -p1
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -106,6 +109,9 @@ mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_compl
 %{_includedir}/tracefs
 
 %changelog
+* Mon Oct 12 2020 Zamir SUN <sztsian@gmail.com> - 2.9.1-3
+- Temporary move libtraceevent back to trace-cmd/plugins to mitigate the conflicts
+
 * Tue Sep 29 2020 Zamir SUN <sztsian@gmail.com> - 2.9.1-2
 - Remove kernelsharl as it's now separate package
 
