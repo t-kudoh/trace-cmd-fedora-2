@@ -5,7 +5,7 @@
 Name: trace-cmd
 Version: 2.9.1
 # Note: After libtraceevent separated, remember to bump release to more than 20 to force a kernelshark update
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
@@ -97,9 +97,11 @@ mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_compl
 
 %files libs
 %dir %{_libdir}/%{name}
-%dir %{_libdir}/traceevent/
-%dir %{_libdir}/tracefs/
-%{_libdir}/trace-cmd/
+%dir %{_libdir}/traceevent
+%dir %{_libdir}/tracefs
+%dir %{_libdir}/trace-cmd
+%{_libdir}/trace-cmd/libtracecmd.so
+%{_libdir}/trace-cmd/plugins
 %{_libdir}/traceevent/
 %{_libdir}/tracefs/
 
@@ -109,6 +111,9 @@ mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_compl
 %{_includedir}/tracefs
 
 %changelog
+* Wed Dec 02 2020 Zamir SUN <sztsian@gmail.com> - 2.9.1-4
+- Move %{_libdir}/trace-cmd/python/ to trace-cmd-python3
+
 * Mon Oct 12 2020 Zamir SUN <sztsian@gmail.com> - 2.9.1-3
 - Temporary move libtraceevent back to trace-cmd/plugins to mitigate the conflicts
 
