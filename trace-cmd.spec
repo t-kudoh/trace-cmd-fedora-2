@@ -17,6 +17,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz
 Patch0: 0001-trace-cmd-Temporary-move-libtraceevent-back-to-_libd.patch
+BuildRequires: make
 BuildRequires:  gcc
 BuildRequires: xmlto
 BuildRequires: asciidoc
