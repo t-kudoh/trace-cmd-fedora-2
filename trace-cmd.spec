@@ -5,7 +5,7 @@
 Name: trace-cmd
 Version: 2.9.1
 # Note: After libtraceevent separated, remember to bump release to more than 20 to force a kernelshark update
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
@@ -112,6 +112,9 @@ mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_compl
 %{_includedir}/tracefs
 
 %changelog
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Wed Dec 02 2020 Zamir SUN <sztsian@gmail.com> - 2.9.1-4
 - Move %{_libdir}/trace-cmd/python/ to trace-cmd-python3
 
