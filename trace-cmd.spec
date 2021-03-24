@@ -4,11 +4,12 @@
 
 Name: trace-cmd
 Version: 2.9.1
-# Note: After libtraceevent separated, remember to bump release to more than 20 to force a kernelshark update
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
+Requires: libtracefs
+Requires: libtraceevent
 
 URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # If upstream does not provide tarballs, to generate:
@@ -16,7 +17,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz
-Patch0: 0001-trace-cmd-Temporary-move-libtraceevent-back-to-_libd.patch
+Patch0: 0001-Don-t-build-or-install-libtraceevent-and-libtracefs.patch
 BuildRequires: make
 BuildRequires:  gcc
 BuildRequires: xmlto
@@ -30,6 +31,7 @@ BuildRequires: cmake
 BuildRequires: qt5-qtbase-devel
 BuildRequires: freeglut-devel
 BuildRequires: json-c-devel
+BuildRequires: libtraceevent-devel
 
 %description
 trace-cmd is a user interface to Ftrace. Instead of needing to use the
@@ -59,8 +61,7 @@ Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
 Development headers of trace-cmd-libs
 
 %prep
-%setup -q -n %{name}-v%{version}
-%patch0 -p1
+%autosetup -n %{name}-v%{version}
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -70,13 +71,13 @@ MANPAGE_DOCBOOK_XSL=`rpm -ql docbook-style-xsl | grep manpages/docbook.xsl`
 CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" BUILD_TYPE=Release \
   make V=9999999999 MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL \
   prefix=%{_prefix} libdir=%{_libdir} \
-  PYTHON_VERS=python3 all doc plugins libs
+  PYTHON_VERS=python3 all_cmd doc libtracecmd.so
 for i in python/*.py ; do 
     sed -i 's/env python2/python3/g' $i
 done
 
 %install
-make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release install install_doc install_python install_libs
+make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release install install_doc install_python install_libtracecmd
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
@@ -98,20 +99,16 @@ mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_compl
 
 %files libs
 %dir %{_libdir}/%{name}
-%dir %{_libdir}/traceevent
-%dir %{_libdir}/tracefs
 %dir %{_libdir}/trace-cmd
 %{_libdir}/trace-cmd/libtracecmd.so
-%{_libdir}/trace-cmd/plugins
-%{_libdir}/traceevent/
-%{_libdir}/tracefs/
 
 %files devel
 %{_includedir}/trace-cmd
-%{_includedir}/traceevent
-%{_includedir}/tracefs
 
 %changelog
+* Wed Mar 24 2021 Jerome Marchand <jmarchan@redhat.com> - 2.9.1-6
+- Build with external libtraceevent and libtracefs
+
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 

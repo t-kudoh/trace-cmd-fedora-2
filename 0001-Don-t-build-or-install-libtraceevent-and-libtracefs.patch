@@ -1,0 +1,47 @@
+From 168d010bf251b7679645fd34e8551f2cf333fcf5 Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Wed, 24 Mar 2021 14:32:26 +0100
+Subject: [PATCH] Don't build or install libtraceevent and libtracefs
+
+---
+ Makefile | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b034042..7b16546 100644
+--- a/Makefile
++++ b/Makefile
+@@ -321,7 +321,7 @@ $(LIBTRACEEVENT_STATIC): force $(obj)/lib/traceevent/plugins/trace_python_dir \
+ $(LIBTRACECMD_STATIC): force
+ 	$(Q)$(MAKE) -C $(src)/lib/trace-cmd $@
+ 
+-$(LIBTRACECMD_SHARED): force $(LIBTRACEEVENT_SHARED)
++$(LIBTRACECMD_SHARED): force
+ 	$(Q)$(MAKE) -C $(src)/lib/trace-cmd $@
+ 
+ $(LIBTRACEFS_STATIC): force
+@@ -392,7 +392,7 @@ install_plugins_traceevent: force
+ install_plugins_tracecmd: force
+ 	$(Q)$(MAKE) -C $(src)/lib/trace-cmd/plugins install_plugins
+ 
+-install_plugins: install_plugins_traceevent install_plugins_tracecmd
++install_plugins: install_plugins_tracecmd
+ 
+ install_python: force
+ 	$(Q)$(MAKE) -C $(src)/python $@
+@@ -410,6 +410,12 @@ install: install_cmd
+ install_gui: install_cmd gui
+ 	$(Q)$(MAKE) $(S) -C $(kshark-dir)/build install
+ 
++install_libtracecmd:
++	$(Q)$(call do_install,$(LIBTRACECMD_SHARED),$(libdir_SQ)/trace-cmd)
++	$(Q)$(call do_install,$(src)/include/trace-cmd/trace-cmd.h,$(includedir_SQ)/trace-cmd)
++	$(Q)$(call do_install,$(src)/include/trace-cmd/trace-filter-hash.h,$(includedir_SQ)/trace-cmd)
++	$(Q)$(call do_install_ld,$(TRACE_LD_FILE),$(LD_SO_CONF_DIR),$(libdir_SQ)/trace-cmd)
++
+ install_libs: libs
+ 	$(Q)$(call do_install,$(LIBTRACECMD_SHARED),$(libdir_SQ)/trace-cmd)
+ 	$(Q)$(call do_install,$(LIBTRACEEVENT_SHARED),$(libdir_SQ)/traceevent)
+-- 
+2.30.2
+
