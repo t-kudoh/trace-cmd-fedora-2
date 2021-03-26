@@ -2,9 +2,11 @@
 #%%global git_commit trace-cmd-v2.6.2
 #%%global git_commit 57371aaa2f469d0ba15fd85276deca7bfdd7ce36
 
+%global srcversion 2.9.2
+
 Name: trace-cmd
-Version: 2.9.1
-Release: 6%{?dist}
+Version: %{srcversion}
+Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
@@ -16,8 +18,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # git clone https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
-Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz
-Patch0: 0001-Don-t-build-or-install-libtraceevent-and-libtracefs.patch
+Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{srcversion}.tar.gz
 BuildRequires: make
 BuildRequires:  gcc
 BuildRequires: xmlto
@@ -47,21 +48,23 @@ BuildRequires: python3-devel
 %description  python3
 Python plugin support for trace-cmd
 
-%package libs
+%package -n libtracecmd
 Summary: Libraries of trace-cmd
+Version: 0
 
-%description libs
-Libraries of trace-cmd
+%description -n libtracecmd
+The libtracecmd library
 
-%package devel
-Summary: Development headers of trace-cmd-libs
-Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
+%package -n libtracecmd-devel
+Summary: Development files for libtracecmd
+Version: 0
+Requires: libtracecmd%{_isa} = %{version}-%{release}
 
-%description devel
-Development headers of trace-cmd-libs
+%description -n libtracecmd-devel
+Development files of the libtracecmd library
 
 %prep
-%autosetup -n %{name}-v%{version}
+%autosetup -n %{name}-v%{srcversion}
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -77,14 +80,11 @@ for i in python/*.py ; do
 done
 
 %install
-make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release install install_doc install_python install_libtracecmd
+make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release install install_doc install_python install_libs
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
-#sed -i '/Version/d' %{buildroot}/%{_datadir}/applications/kernelshark.desktop
-#desktop-file-validate %{buildroot}/%{_datadir}/applications/kernelshark.desktop
 mkdir -p %{buildroot}/%{_sysconfdir}
-mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_completion.d
 
 %files
 %doc COPYING COPYING.LIB README
@@ -97,15 +97,23 @@ mv %{buildroot}/usr/etc/bash_completion.d %{buildroot}/%{_sysconfdir}/bash_compl
 %doc Documentation/README.PythonPlugin
 %{_libdir}/%{name}/python/
 
-%files libs
-%dir %{_libdir}/%{name}
-%dir %{_libdir}/trace-cmd
-%{_libdir}/trace-cmd/libtracecmd.so
+%files -n libtracecmd
+%doc COPYING COPYING.LIB README
+%{_libdir}/libtracecmd.so.0
+%{_libdir}/libtracecmd.so.0.0.1
+%{_docdir}/libtracecmd-doc
+%{_mandir}/man3/libtracecmd*
+%{_mandir}/man3/tracecmd*
 
-%files devel
+%files -n libtracecmd-devel
+%{_libdir}/pkgconfig/libtracecmd.pc
+%{_libdir}/libtracecmd.so
 %{_includedir}/trace-cmd
 
 %changelog
+* Fri Mar 26 2021 2020 Zamir SUN <sztsian@gmail.com> - 2.9.2-1
+- Update to 2.9.2
+
 * Wed Mar 24 2021 Jerome Marchand <jmarchan@redhat.com> - 2.9.1-6
 - Build with external libtraceevent and libtracefs
 
