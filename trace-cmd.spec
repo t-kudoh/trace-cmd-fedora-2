@@ -6,10 +6,10 @@
 
 Name: trace-cmd
 Version: %{srcversion}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
-Requires: trace-cmd-libs%{_isa} = %{version}-%{release}
+Requires: libtracecmd
 Requires: libtracefs
 Requires: libtraceevent
 
@@ -20,7 +20,7 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{srcversion}.tar.gz
 BuildRequires: make
-BuildRequires:  gcc
+BuildRequires: gcc
 BuildRequires: xmlto
 BuildRequires: asciidoc
 BuildRequires: mlocate
@@ -111,7 +111,11 @@ mkdir -p %{buildroot}/%{_sysconfdir}
 %{_includedir}/trace-cmd
 
 %changelog
-* Fri Mar 26 2021 2020 Zamir SUN <sztsian@gmail.com> - 2.9.2-1
+* Mon Mar 29 2021 Zamir SUN <sztsian@gmail.com> - 2.9.2-2
+- Fix dependency of libtracecmd
+- Resolves https://bugzilla.redhat.com/show_bug.cgi?id=1943919
+
+* Fri Mar 26 2021 Zamir SUN <sztsian@gmail.com> - 2.9.2-1
 - Update to 2.9.2
 
 * Wed Mar 24 2021 Jerome Marchand <jmarchan@redhat.com> - 2.9.1-6
