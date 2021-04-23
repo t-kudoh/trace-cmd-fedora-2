@@ -6,7 +6,7 @@
 
 Name: trace-cmd
 Version: %{srcversion}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: libtracecmd
@@ -33,6 +33,7 @@ BuildRequires: qt5-qtbase-devel
 BuildRequires: freeglut-devel
 BuildRequires: json-c-devel
 BuildRequires: libtraceevent-devel
+BuildRequires: chrpath
 
 %description
 trace-cmd is a user interface to Ftrace. Instead of needing to use the
@@ -78,6 +79,7 @@ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" BUILD_TYPE=Release
 for i in python/*.py ; do 
     sed -i 's/env python2/python3/g' $i
 done
+chrpath --delete tracecmd/trace-cmd
 
 %install
 make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags} -z muldefs " BUILD_TYPE=Release install install_doc install_python install_libs
@@ -111,6 +113,9 @@ mkdir -p %{buildroot}/%{_sysconfdir}
 %{_includedir}/trace-cmd
 
 %changelog
+* Fri Apr 23 2021 Jerome Marchand <jmarchan@redhat.com> - 2.9.2-3
+- Build w/o rpath as per Fedora packaging guideline
+
 * Mon Mar 29 2021 Zamir SUN <sztsian@gmail.com> - 2.9.2-2
 - Fix dependency of libtracecmd
 - Resolves https://bugzilla.redhat.com/show_bug.cgi?id=1943919
