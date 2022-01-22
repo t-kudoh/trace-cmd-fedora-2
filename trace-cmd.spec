@@ -6,7 +6,7 @@
 
 Name: trace-cmd
 Version: %{srcversion}
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: libtracecmd
@@ -113,6 +113,9 @@ mkdir -p %{buildroot}/%{_sysconfdir}
 %{_includedir}/trace-cmd
 
 %changelog
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.2-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
