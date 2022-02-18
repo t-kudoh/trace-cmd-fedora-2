@@ -2,17 +2,19 @@
 #%%global git_commit trace-cmd-v2.6.2
 #%%global git_commit 57371aaa2f469d0ba15fd85276deca7bfdd7ce36
 
-%global srcversion 2.9.2
+%global srcversion 2.9.7
 
 Name: trace-cmd
 Version: %{srcversion}
-Release: 5%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: libtracecmd
 Requires: libtracefs
 Requires: libtraceevent
-
+# Exclude i686 due to build failure
+# https://bugzilla.redhat.com/show_bug.cgi?id=2055949
+ExcludeArch: %{ix86}
 URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # If upstream does not provide tarballs, to generate:
 # git clone https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git
@@ -33,7 +35,10 @@ BuildRequires: qt5-qtbase-devel
 BuildRequires: freeglut-devel
 BuildRequires: json-c-devel
 BuildRequires: libtraceevent-devel
+BuildRequires: libtracefs-devel
+BuildRequires: audit-libs-devel
 BuildRequires: chrpath
+BuildRequires: swig
 
 %description
 trace-cmd is a user interface to Ftrace. Instead of needing to use the
@@ -43,7 +48,6 @@ tracers and will record into a data file.
 %package python3
 Summary: Python plugin support for trace-cmd
 Requires: trace-cmd%{_isa} = %{version}-%{release}
-BuildRequires: swig
 BuildRequires: python3-devel
 
 %description  python3
@@ -113,6 +117,9 @@ mkdir -p %{buildroot}/%{_sysconfdir}
 %{_includedir}/trace-cmd
 
 %changelog
+* Wed Feb 16 2022 Zamir SUN <sztsian@gmail.com> - 2.9.7-1
+- Update to 2.9.7
+
 * Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
