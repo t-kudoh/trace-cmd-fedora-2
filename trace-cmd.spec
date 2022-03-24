@@ -6,7 +6,7 @@
 
 Name: trace-cmd
 Version: %{srcversion}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and LGPLv2
 Summary: A user interface to Ftrace
 Requires: libtracecmd
@@ -21,6 +21,9 @@ URL: http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 Source0: https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{srcversion}.tar.gz
+Source1: trace-cmd.conf
+Source2: trace-cmd.service
+Source3: 98-trace-cmd.rules
 BuildRequires: make
 BuildRequires: gcc
 BuildRequires: xmlto
@@ -39,6 +42,7 @@ BuildRequires: libtracefs-devel
 BuildRequires: audit-libs-devel
 BuildRequires: chrpath
 BuildRequires: swig
+BuildRequires: systemd-rpm-macros
 
 %description
 trace-cmd is a user interface to Ftrace. Instead of needing to use the
@@ -70,6 +74,9 @@ Development files of the libtracecmd library
 
 %prep
 %autosetup -n %{name}-v%{srcversion}
+cp %{SOURCE1} .
+cp %{SOURCE2} .
+cp %{SOURCE3} .
 
 %build
 # MANPAGE_DOCBOOK_XSL define is hack to avoid using locate
@@ -90,7 +97,15 @@ make libdir=%{_libdir} prefix=%{_prefix} V=1 DESTDIR=%{buildroot}/ CFLAGS="%{opt
 find %{buildroot}%{_mandir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_datadir} -type f | xargs chmod u-x,g-x,o-x
 find %{buildroot}%{_libdir} -type f -iname "*.so" | xargs chmod 0755
-mkdir -p %{buildroot}/%{_sysconfdir}
+mkdir -p -m755 %{buildroot}/%{_sysconfdir}/sysconfig/
+mkdir -p -m755 %{buildroot}/%{_unitdir}/
+mkdir -p -m755 %{buildroot}/%{_udevrulesdir}/
+install -p -m 644 trace-cmd.conf %{buildroot}/%{_sysconfdir}/sysconfig/
+install -p -m 644 trace-cmd.service %{buildroot}/%{_unitdir}/
+install -p -m 644 98-trace-cmd.rules %{buildroot}/%{_udevrulesdir}/
+
+%preun
+%systemd_preun %{name}.service
 
 %files
 %doc COPYING COPYING.LIB README
@@ -98,6 +113,9 @@ mkdir -p %{buildroot}/%{_sysconfdir}
 %{_mandir}/man1/%{name}*
 %{_mandir}/man5/%{name}*
 %{_sysconfdir}/bash_completion.d/trace-cmd.bash
+%{_sysconfdir}/sysconfig/trace-cmd.conf
+%{_unitdir}/trace-cmd.service
+%{_udevrulesdir}/98-trace-cmd.rules
 
 %files python3
 %doc Documentation/README.PythonPlugin
@@ -117,6 +135,9 @@ mkdir -p %{buildroot}/%{_sysconfdir}
 %{_includedir}/trace-cmd
 
 %changelog
+* Fri Mar 18 2022 KUDOH Takashi <t-kudoh@fujitsu.com> - 2.9.7-2
+- Add flight recoder service
+
 * Wed Feb 16 2022 Zamir SUN <sztsian@gmail.com> - 2.9.7-1
 - Update to 2.9.7
 
